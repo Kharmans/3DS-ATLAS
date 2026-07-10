@@ -1,0 +1,32 @@
+<div class="atlas-module-list">
+  <p class="notes">{{localize "ATLAS.Theme.Hint"}}</p>
+  {{#if modules.length}}
+    {{#each modules as |mod|}}
+      <div class="form-group">
+        <label>
+          {{#if mod.swatch}}<span class="atlas-swatch" style="--atlas-swatch: {{mod.swatch}}"></span>{{/if}}
+          {{mod.title}}
+        </label>
+        <div class="form-fields">
+          {{> "modules/3ds-atlas/templates/theme-config/select.hbs" sel=mod.select moduleId=mod.id}}
+          {{#if @root.isGM}}
+            <label class="checkbox atlas-force" data-tooltip="{{localize "ATLAS.Theme.ForceHint"}}">
+              <input type="checkbox" data-force="{{mod.id}}" {{#if mod.forced}}checked{{/if}}>
+              {{localize "ATLAS.Theme.Force"}}
+            </label>
+          {{/if}}
+        </div>
+      </div>
+      {{#each mod.apps as |app|}}
+        <div class="form-group atlas-app-group">
+          <label>{{app.label}}</label>
+          <div class="form-fields">
+            {{> "modules/3ds-atlas/templates/theme-config/select.hbs" sel=app.select moduleId=../mod.id appKey=app.key}}
+          </div>
+        </div>
+      {{/each}}
+    {{/each}}
+  {{else}}
+    <p class="atlas-empty">{{localize "ATLAS.Theme.NoModules"}}</p>
+  {{/if}}
+</div>

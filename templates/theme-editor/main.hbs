@@ -1,0 +1,21 @@
+<div class="atlas-theme-editor-body">
+  <div class="form-group">
+    <label for="atlas-custom-name">{{localize "ATLAS.Theme.CustomName"}}</label>
+    <div class="form-fields">
+      <input type="text" id="atlas-custom-name" name="customName" value="{{name}}">
+    </div>
+  </div>
+  {{#each categories as |cat|}}
+    <fieldset class="atlas-color-group">
+      <legend>{{localize cat.label}}</legend>
+      {{#each cat.fields as |f|}}
+        <div class="form-group">
+          <label>{{f.label}}</label>
+          <div class="form-fields">
+            <color-picker name="colors.{{f.key}}" value="{{f.value}}" data-key="{{f.key}}"></color-picker>
+          </div>
+        </div>
+      {{/each}}
+    </fieldset>
+  {{/each}}
+</div>

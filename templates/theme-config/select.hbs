@@ -1,0 +1,12 @@
+<select data-module="{{moduleId}}" {{#if appKey}}data-app="{{appKey}}" {{/if}}>
+  <option value="none" {{#if sel.isDefault}}selected{{/if}}>{{localize sel.defaultLabel}}</option>
+  {{#each sel.groups as |grp|}}
+    {{#if grp.choices.length}}
+      <optgroup label="{{localize grp.group}}">
+        {{#each grp.choices as |c|}}
+          <option value="{{c.key}}" {{#if c.selected}}selected{{/if}}>{{c.name}}</option>
+        {{/each}}
+      </optgroup>
+    {{/if}}
+  {{/each}}
+</select>

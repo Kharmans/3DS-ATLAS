@@ -1,0 +1,40 @@
+:root {
+  --atlas-surface-bg: rgb(255 255 255 / 5%);
+  --atlas-surface-border: rgb(255 255 255 / 15%);
+  --atlas-surface-divider: rgb(255 255 255 / 10%);
+  --atlas-surface-link: rgb(107 168 240);
+  --atlas-surface-text: rgb(235 235 235);
+  --atlas-surface-text-dim: rgb(175 175 175);
+}
+
+.theme-light {
+  --atlas-surface-bg: rgb(0 0 0 / 5%);
+  --atlas-surface-border: rgb(0 0 0 / 15%);
+  --atlas-surface-divider: rgb(0 0 0 / 10%);
+  --atlas-surface-link: rgb(40 112 194);
+  --atlas-surface-text: rgb(30 30 30);
+  --atlas-surface-text-dim: rgb(90 90 90);
+}
+
+.atlas-update-notice {
+  h3 {
+    margin: 0 0 0.25rem;
+    color: var(--atlas-surface-text);
+  }
+
+  a {
+    color: var(--atlas-surface-link);
+  }
+
+  .atlas-update-list {
+    margin: 0.25rem 0 0;
+    padding-left: 1.25rem;
+  }
+
+  .atlas-update-notes {
+    margin-top: 0.25rem;
+    color: var(--atlas-surface-text-dim);
+    font-size: 0.9em;
+    white-space: pre-wrap;
+  }
+}

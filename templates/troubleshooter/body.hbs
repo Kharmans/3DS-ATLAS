@@ -1,0 +1,13 @@
+<div class="atlas-troubleshooter-body">
+  <div class="form-group">
+    <label for="atlas-scope">{{localize "ATLAS.Troubleshooter.Scope"}}</label>
+    <div class="form-fields">
+      <select id="atlas-scope" name="atlas-scope">
+        {{#each options as |o|}}
+          <option value="{{o.value}}" {{#if o.selected}}selected{{/if}}>{{o.label}}</option>
+        {{/each}}
+      </select>
+    </div>
+  </div>
+  <pre class="atlas-ts-report">{{report}}</pre>
+</div>
