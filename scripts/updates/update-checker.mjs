@@ -1,75 +1,84 @@
 import { MODULE, SETTINGS } from '../constants.mjs';
 import { getRegisteredModules } from '../registry.mjs';
-import { log } from '../utils/logger.mjs';
+import UpdateNotice from './update-notice.mjs';
+
+/** Central 3DS module version map. */
+const VERSIONS_URL = 'https://www.3deathsaves.com/versions.json';
 
 /**
- * Fetch the latest GitHub release for a repo.
- * @param {string} repo  GitHub "owner/repo"
- * @returns {Promise<{version: string, body: string, url: string}|null>}
+ * Read a module's bundled release notes.
+ * @param {string} moduleId  Registered module id.
+ * @returns {Promise<string>}
  */
-async function fetchLatestRelease(repo) {
+async function fetchReleaseNotes(moduleId) {
   try {
-    const res = await fetch(`https://api.github.com/repos/${repo}/releases/latest`, { headers: { Accept: 'application/vnd.github+json' } });
-    if (!res.ok) return null;
-    const data = await res.json();
-    const version = (data.tag_name || '').replace(/^release-/, '').replace(/^v/, '');
-    return { version, body: data.body || '', url: data.html_url };
-  } catch (err) {
-    log(2, `Update check failed for ${repo}:`, err);
-    return null;
+    const res = await fetch(`modules/${moduleId}/release_notes.txt`);
+    return res.ok ? (await res.text()).trim() : '';
+  } catch {
+    return '';
   }
 }
 
 /**
- * Post a single whispered chat notice to the GM.
- * @param {string} title     Message heading
- * @param {string} bodyHtml  Inner HTML body
+ * Read the central module version map.
+ * @returns {Promise<Object<string, string>>}
+ */
+async function fetchLatestVersions() {
+  try {
+    const res = await fetch(VERSIONS_URL);
+    return res.ok ? await res.json() : {};
+  } catch {
+    return {};
+  }
+}
+
+/**
+ * Whisper the GM a chat list of modules with a newer version available.
+ * @param {{title: string, version: string, url: ?string}[]} pending  Available updates.
  * @returns {Promise<void>}
  */
-async function postNotice(title, bodyHtml) {
-  const content = `<div class="atlas-update-notice"><h3>${title}</h3>${bodyHtml}</div>`;
+async function postAvailableChat(pending) {
+  const items = pending.map((p) => `<li>${p.url ? `<a href="${p.url}">${p.title} ${p.version}</a>` : `${p.title} ${p.version}`}</li>`).join('');
+  const content = `<div class="atlas-update-notice"><h3>${_loc('ATLAS.Update.PendingTitle')}</h3><ul class="atlas-update-list">${items}</ul></div>`;
   await ChatMessage.create({ content, whisper: [game.user.id], speaker: { alias: MODULE.TITLE } });
 }
 
 /**
- * Check every registered module and emit at most two messages.
+ * Check every registered module: chat-whisper available versions (Update Notices) and
+ * pop the changelog window for newly-installed ones (Changelogger). Each is independently toggled.
  * @returns {Promise<void>}
  */
 export async function checkForUpdates() {
   if (!game.user.isGM) return;
-  if (!game.settings.get(MODULE.ID, SETTINGS.UPDATE_NOTICES)) return;
+  const wantChat = game.settings.get(MODULE.ID, SETTINGS.UPDATE_NOTICES);
+  const wantLog = game.settings.get(MODULE.ID, SETTINGS.CHANGELOGGER);
+  if (!wantChat && !wantLog) return;
   const seen = game.settings.get(MODULE.ID, SETTINGS.SEEN_VERSIONS) || {};
+  const notified = game.settings.get(MODULE.ID, SETTINGS.NOTIFIED_AVAILABLE) || {};
+  const latest = wantChat ? await fetchLatestVersions() : {};
   const changed = [];
   const pending = [];
   let dirty = false;
+  let notifiedDirty = false;
   for (const entry of getRegisteredModules().values()) {
-    if (!entry.github) continue;
-    const installed = game.modules.get(entry.id)?.version;
+    const mod = game.modules.get(entry.id);
+    const installed = mod?.version;
     if (!installed) continue;
-    if (seen[entry.id] && seen[entry.id] !== installed) {
-      const release = await fetchLatestRelease(entry.github);
-      const notes = release?.version === installed ? release.body : '';
-      changed.push({ title: entry.title, version: installed, notes });
-      seen[entry.id] = installed;
-      dirty = true;
-      continue;
-    }
-    const release = await fetchLatestRelease(entry.github);
-    if (release?.version && foundry.utils.isNewerVersion(release.version, installed)) pending.push({ title: entry.title, version: release.version, url: release.url });
-    if (!seen[entry.id]) {
+    if (wantLog && seen[entry.id] && seen[entry.id] !== installed) changed.push({ id: entry.id, title: entry.title, version: installed, notes: await fetchReleaseNotes(entry.id) });
+    if (seen[entry.id] !== installed) {
       seen[entry.id] = installed;
       dirty = true;
     }
+    const remote = latest[entry.id];
+    if (wantChat && remote && foundry.utils.isNewerVersion(remote, installed) && notified[entry.id] !== remote) {
+      const url = mod.protected ? `https://foundryvtt.com/packages/${entry.id}` : mod.url;
+      pending.push({ title: entry.title, version: remote, url });
+      notified[entry.id] = remote;
+      notifiedDirty = true;
+    }
   }
-  if (changed.length) {
-    const items = changed
-      .map((c) => `<li><strong>${c.title} ${c.version}</strong>${c.notes ? `<div class="atlas-update-notes">${foundry.utils.escapeHTML?.(c.notes) ?? c.notes}</div>` : ''}</li>`)
-      .join('');
-    await postNotice(_loc('ATLAS.Update.ChangedTitle'), `<ul class="atlas-update-list">${items}</ul>`);
-  }
-  if (pending.length) {
-    const items = pending.map((p) => `<li><a href="${p.url}">${p.title} ${p.version}</a></li>`).join('');
-    await postNotice(_loc('ATLAS.Update.PendingTitle'), `<ul class="atlas-update-list">${items}</ul>`);
-  }
+  if (changed.length) new UpdateNotice({ changed }).render(true);
+  if (pending.length) await postAvailableChat(pending);
   if (dirty) await game.settings.set(MODULE.ID, SETTINGS.SEEN_VERSIONS, seen);
+  if (notifiedDirty) await game.settings.set(MODULE.ID, SETTINGS.NOTIFIED_AVAILABLE, notified);
 }

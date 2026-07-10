@@ -31,10 +31,18 @@ export default class ATLASSettings {
       config: true,
       type: new BooleanField({ initial: true })
     });
+    game.settings.register(MODULE.ID, SETTINGS.CHANGELOGGER, {
+      name: 'ATLAS.Settings.Changelogger.Name',
+      hint: 'ATLAS.Settings.Changelogger.Hint',
+      scope: 'world',
+      config: true,
+      type: new BooleanField({ initial: true })
+    });
     game.settings.register(MODULE.ID, SETTINGS.MODULE_THEMES, { scope: 'client', config: false, type: new ObjectField({ initial: {} }) });
     game.settings.register(MODULE.ID, SETTINGS.FORCED_THEMES, { scope: 'world', config: false, type: new ObjectField({ initial: {} }), onChange: () => initializeThemes() });
     game.settings.register(MODULE.ID, SETTINGS.CUSTOM_THEMES, { scope: 'client', config: false, type: new ObjectField({ initial: {} }) });
     game.settings.register(MODULE.ID, SETTINGS.SEEN_VERSIONS, { scope: 'world', config: false, type: new ObjectField({ initial: {} }) });
+    game.settings.register(MODULE.ID, SETTINGS.NOTIFIED_AVAILABLE, { scope: 'world', config: false, type: new ObjectField({ initial: {} }) });
     game.settings.registerMenu(MODULE.ID, 'themeConfig', {
       name: 'ATLAS.Theme.MenuName',
       label: 'ATLAS.Theme.MenuLabel',

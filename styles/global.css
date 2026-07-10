@@ -17,13 +17,41 @@
 }
 
 .atlas-update-notice {
-  h3 {
-    margin: 0 0 0.25rem;
-    color: var(--atlas-surface-text);
+  .window-content {
+    gap: 0.75rem;
+    flex-direction: row;
   }
 
   a {
     color: var(--atlas-surface-link);
+  }
+
+  .atlas-update-tabs {
+    gap: 0.25rem;
+    display: flex;
+    flex: 0 0 auto;
+    flex-direction: column;
+    padding-right: 0.75rem;
+    border-right: thin solid var(--atlas-surface-divider);
+  }
+
+  .atlas-update-tab {
+    padding: 0.25rem 0.5rem;
+    border-left: 0.125rem solid transparent;
+    color: var(--atlas-surface-text-dim);
+    cursor: pointer;
+  }
+
+  .atlas-update-tab.active {
+    border-left-color: var(--atlas-surface-link);
+    color: var(--atlas-surface-text);
+  }
+
+  .atlas-update-content {
+    flex: 1 1 auto;
+    min-width: 0;
+    max-height: 60vh;
+    overflow-y: auto;
   }
 
   .atlas-update-list {
@@ -31,10 +59,7 @@
     padding-left: 1.25rem;
   }
 
-  .atlas-update-notes {
-    margin-top: 0.25rem;
+  .atlas-update-empty {
     color: var(--atlas-surface-text-dim);
-    font-size: 0.9em;
-    white-space: pre-wrap;
   }
 }

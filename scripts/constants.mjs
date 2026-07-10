@@ -12,7 +12,9 @@ export const SETTINGS = {
   FORCED_THEMES: 'forcedThemes',
   CUSTOM_THEMES: 'customThemes',
   UPDATE_NOTICES: 'updateNotices',
-  SEEN_VERSIONS: 'seenVersions'
+  CHANGELOGGER: 'changelogger',
+  SEEN_VERSIONS: 'seenVersions',
+  NOTIFIED_AVAILABLE: 'notifiedAvailable'
 };
 
 /** @enum {string} Custom hook event names dispatched by ATLAS */

@@ -1,0 +1,5 @@
+<nav class="atlas-update-tabs">
+  {{#each tabs as |t|}}
+    <a class="atlas-update-tab {{#if t.active}}active{{/if}}" data-tab="{{t.key}}">{{t.label}}</a>
+  {{/each}}
+</nav>
