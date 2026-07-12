@@ -86,12 +86,22 @@ export default class ThemeConfig extends HandlebarsApplicationMixin(ApplicationV
         apps
       });
     }
-    return { isGM: game.user.isGM, modules, customThemes: customChoices, presetChoices };
+    const allSelect = buildSelect('none', 'ATLAS.Theme.AllPlaceholder');
+    return { isGM: game.user.isGM, modules, allSelect, customThemes: customChoices, presetChoices };
   }
 
   /** @inheritdoc */
   _onRender(context, options) {
     super._onRender(context, options);
+    this.element.querySelector('select[data-all]')?.addEventListener('change', async (event) => {
+      const key = event.target.value;
+      for (const entry of getRegisteredModules().values()) {
+        if (!entry.theme?.scope) continue;
+        await setModuleTheme(entry.id, key);
+        for (const app of getAppScopes(entry.theme)) await setModuleTheme(entry.id, key, app.key);
+      }
+      this.render();
+    });
     for (const select of this.element.querySelectorAll('select[data-module]')) {
       select.addEventListener('change', async (event) => {
         const el = event.target;

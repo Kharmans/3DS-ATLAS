@@ -36,6 +36,13 @@
     }
   }
 
+  .atlas-all-divider {
+    width: 100%;
+    margin: 0.35rem 0;
+    border: none;
+    border-top: thin solid var(--atlas-border, rgb(74 74 74));
+  }
+
   .atlas-empty {
     color: var(--atlas-text-dim, rgb(153 153 153));
     font-style: italic;

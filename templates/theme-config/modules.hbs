@@ -1,6 +1,13 @@
 <div class="atlas-module-list">
   <p class="notes">{{localize "ATLAS.Theme.Hint"}}</p>
   {{#if modules.length}}
+    <div class="form-group atlas-all-group">
+      <label>{{localize "ATLAS.Theme.All"}}</label>
+      <div class="form-fields">
+        {{> "modules/3ds-atlas/templates/theme-config/select.hbs" sel=allSelect isAll=true}}
+      </div>
+    </div>
+    <hr class="atlas-all-divider">
     {{#each modules as |mod|}}
       <div class="form-group">
         <label>

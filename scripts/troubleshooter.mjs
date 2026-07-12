@@ -56,8 +56,11 @@ export default class Troubleshooter extends HandlebarsApplicationMixin(Applicati
    * @returns {Promise<void>}
    */
   static async #onExportReport() {
-    const stamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
-    foundry.utils.saveDataToFile(await renderFullReport(this.#scope, this.#system, 'export'), 'text/markdown', `3ds-troubleshooter-${this.#scope}-${stamp}.md`);
+    const d = new Date();
+    const p = (n) => String(n).padStart(2, '0');
+    const stamp = `${p(d.getMonth() + 1)}-${p(d.getDate())}-${d.getFullYear()}-${p(d.getHours())}${p(d.getMinutes())}`;
+    const scope = this.#scope === 'all' ? 'ALL' : this.#scope;
+    foundry.utils.saveDataToFile(await renderFullReport(this.#scope, this.#system, 'export'), 'text/markdown', `3DSATLAS_TROUBLESHOOTER_${scope}_${stamp}.md`);
     ui.notifications.info('ATLAS.Troubleshooter.Exported');
   }
 }
