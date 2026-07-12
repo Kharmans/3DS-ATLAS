@@ -1,0 +1,23 @@
+## New Features
+
+- Add a Changelogger popup that shows per-module release notes after a 3DS module updates
+- Add a per-module and per-application theme engine with 20 presets, custom themes with import/export, and a GM world-forced override
+- Add a Theme Config picker with live preview and a standalone color editor for building custom themes
+- Add a troubleshooter that folds in Foundry's support metrics and exports a Markdown report
+- Add an All Modules picker in the Theme Config that applies one theme to every module and sub-application at once
+- Let registered 3DS modules add their own Debug sections to the troubleshooter report
+- Post consolidated "update available" and "updated" notices pulled from the central 3DS version map
+
+## Bug Fixes
+
+- Fix the Hero Mancer troubleshooter export-session confirm prompt showing a raw localization key instead of its text
+
+## Changes
+
+- Change Update Notices to a whispered chat list of 3DS modules with a newer version available
+- Gate the Changelogger and Update Notices behind separate world settings
+- Rename the troubleshooter export file to 3DSATLAS_TROUBLESHOOTER_<SCOPE>_MM-DD-YYYY-HHMM
+
+## Documentation
+
+- Rewrite the README with feature overview, install instructions, and manifest URL
