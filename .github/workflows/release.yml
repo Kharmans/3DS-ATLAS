@@ -167,7 +167,7 @@ jobs:
           foundry_url = os.environ.get('FOUNDRY_URL', 'https://foundryvtt.com/packages/3ds-atlas')
 
           payload = json.dumps({
-              'content': '',
+              'content': '<@&1384920094597185556>',
               'embeds': [{
                   'title': title,
                   'url': release_page,
