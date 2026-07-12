@@ -29,6 +29,52 @@ function collectTheme(moduleId) {
 }
 
 /**
+ * Troubleshooter lines for the dnd5e CompendiumBrowser's enabled sources. Shared by modules whose debug hook
+ * reports which packs are in scope; returns nothing off dnd5e.
+ * @returns {string[]}
+ */
+export function dnd5eSourceLines() {
+  if (game.system.id !== 'dnd5e') return [];
+  const sources = game.settings.get('dnd5e', 'packSourceConfiguration') ?? {};
+  const enabled = [];
+  for (const { collection, documentName } of game.packs) {
+    if (documentName !== 'Actor' && documentName !== 'Item') continue;
+    if (sources[collection] !== false) enabled.push(collection);
+  }
+  return ['#### CompendiumBrowser Sources (enabled)', '', ...enabled.sort().map((c) => `- ${c}`)];
+}
+
+/**
+ * Invoke a module's optional debug callback (may be async), guarding against throws.
+ * @param {?Function} fn                 The module's debug callback.
+ * @param {{mode: string}} ctx           Report context passed to the hook.
+ * @returns {Promise<string[]>}
+ */
+async function collectDebug(fn, ctx) {
+  if (typeof fn !== 'function') return [];
+  try {
+    const out = await fn(ctx);
+    return Array.isArray(out) ? out.map(String) : out ? [String(out)] : [];
+  } catch (err) {
+    return [`_debug hook threw: ${err.message}_`];
+  }
+}
+
+/**
+ * Resolve each module's debug lines in place (mutates `modules`). Full report only.
+ * @param {object[]} modules      buildReport().modules
+ * @param {{mode: string}} ctx    Report context; `mode` is `'display'`, `'copy'`, or `'export'`.
+ * @returns {Promise<void>}
+ */
+export async function resolveDebug(modules, ctx) {
+  await Promise.all(
+    modules.map(async (m) => {
+      m.debug = await collectDebug(m.debugFn, ctx);
+    })
+  );
+}
+
+/**
  * Build the ATLAS diagnostics snapshot: the registered 3DS modules (scoped) and a full module list.
  * @param {string} [scope]  `'all'` (default) for every registered 3DS module, or a single module id.
  * @returns {object}
@@ -45,7 +91,8 @@ export function buildReport(scope = 'all') {
       github: entry.github,
       themeScope: entry.theme?.scope ?? null,
       theme: collectTheme(id),
-      settings: collectSettings(id)
+      settings: collectSettings(id),
+      debugFn: entry.debug
     };
   });
   const allModules = game.modules.map((m) => ({ id: m.id, title: m.title, version: m.version, manifest: m.manifest, active: m.active })).sort((a, b) => a.id.localeCompare(b.id));
@@ -74,6 +121,10 @@ function moduleSectionLines(modules) {
     if (m.settings.length) {
       L.push('', '### Settings', '');
       for (const s of m.settings) L.push(`- \`${s.key}\`: ${s.value}`);
+    }
+    if (m.debug?.length) {
+      L.push('', '### Debug', '');
+      for (const line of m.debug) L.push(line);
     }
     L.push('');
   }
@@ -142,10 +193,12 @@ export async function collectSystemData() {
  * Full troubleshooter report.
  * @param {string} scope                        `'all'` or a single module id.
  * @param {{core: ?object, sizes: ?Object<string, number>}} system  Result of collectSystemData().
- * @returns {string}
+ * @param {string} [mode]  Report context for debug hooks: `'display'` (default), `'copy'`, or `'export'`.
+ * @returns {Promise<string>}
  */
-export function renderFullReport(scope, system) {
+export async function renderFullReport(scope, system, mode = 'display') {
   const r = buildReport(scope);
+  await resolveDebug(r.modules, { mode });
   const core = system?.core ?? {};
   const sizes = system?.sizes ?? null;
   const L = ['# 3DS:ATLAS Troubleshooter', '', `_Generated ${r.generated}_`, ''];

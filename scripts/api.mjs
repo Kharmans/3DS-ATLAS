@@ -1,5 +1,5 @@
 import { MODULE } from './constants.mjs';
-import { buildReport, reportToMarkdown } from './diagnostics.mjs';
+import { buildReport, dnd5eSourceLines, reportToMarkdown } from './diagnostics.mjs';
 import { getModule, getRegisteredModules, register } from './registry.mjs';
 import { THEME_PRESETS } from './theme/presets.mjs';
 import {
@@ -57,7 +57,7 @@ export const ATLASAPI = {
     importCustomTheme
   },
   updates: { checkForUpdates },
-  diagnostics: { buildReport, reportToMarkdown, open: () => new Troubleshooter().render(true) }
+  diagnostics: { buildReport, reportToMarkdown, dnd5eSourceLines, open: () => new Troubleshooter().render(true) }
 };
 
 /**

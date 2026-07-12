@@ -30,7 +30,7 @@ export default class Troubleshooter extends HandlebarsApplicationMixin(Applicati
     this.#system ??= await collectSystemData();
     const options = [{ value: 'all', label: game.i18n.localize('ATLAS.Troubleshooter.AllModules'), selected: this.#scope === 'all' }];
     for (const entry of getRegisteredModules().values()) options.push({ value: entry.id, label: entry.title, selected: entry.id === this.#scope });
-    return { options, report: renderFullReport(this.#scope, this.#system) };
+    return { options, report: await renderFullReport(this.#scope, this.#system) };
   }
 
   /** @inheritdoc */
@@ -47,17 +47,17 @@ export default class Troubleshooter extends HandlebarsApplicationMixin(Applicati
    * @returns {Promise<void>}
    */
   static async #onCopyReport() {
-    await game.clipboard.copyPlainText(renderFullReport(this.#scope, this.#system));
+    await game.clipboard.copyPlainText(await renderFullReport(this.#scope, this.#system, 'copy'));
     ui.notifications.info('ATLAS.Troubleshooter.Copied');
   }
 
   /**
    * Download the report for the current scope as a timestamped Markdown file.
-   * @returns {void}
+   * @returns {Promise<void>}
    */
-  static #onExportReport() {
+  static async #onExportReport() {
     const stamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
-    foundry.utils.saveDataToFile(renderFullReport(this.#scope, this.#system), 'text/markdown', `3ds-troubleshooter-${this.#scope}-${stamp}.md`);
+    foundry.utils.saveDataToFile(await renderFullReport(this.#scope, this.#system, 'export'), 'text/markdown', `3ds-troubleshooter-${this.#scope}-${stamp}.md`);
     ui.notifications.info('ATLAS.Troubleshooter.Exported');
   }
 }

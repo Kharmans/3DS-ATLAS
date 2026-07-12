@@ -13,11 +13,12 @@ const registered = new Map();
  * @param {string} [config.title]           Human-readable module title
  * @param {string} [config.github]          "owner/repo" for update notices
  * @param {{scope: string}} [config.theme]  CSS selector its applications live under
+ * @param {() => (string|string[])} [config.debug]  Optional callback returning extra troubleshooter lines for this module
  * @returns {object}
  */
 export function register(moduleId, config = {}) {
   const title = config.title || game.modules.get(moduleId)?.title || moduleId;
-  const entry = { id: moduleId, title, github: config.github ?? null, theme: config.theme ?? null };
+  const entry = { id: moduleId, title, github: config.github ?? null, theme: config.theme ?? null, debug: typeof config.debug === 'function' ? config.debug : null };
   registered.set(moduleId, entry);
   Hooks.callAll(HOOKS.REGISTERED, entry);
   return buildHandle(entry);
