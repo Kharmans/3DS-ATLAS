@@ -4581,6 +4581,7 @@
   "HEROMANCER.Settings.TrimSourceParenthetical.Name": "Trim Sourcebook Suffix",
   "HEROMANCER.Settings.Troubleshooter.CopySuccess": "Report copied to clipboard.",
   "HEROMANCER.Settings.Troubleshooter.CopyToClipboard": "Copy to Clipboard",
+  "HEROMANCER.Settings.Troubleshooter.ExportSessionPrompt": "A Hero Mancer window is open. Also export the current build (selected items and their granted items) so the issue can be recreated?",
   "HEROMANCER.Settings.Troubleshooter.Github": "GitHub",
   "HEROMANCER.Settings.Troubleshooter.Menu.Hint": "Generate a diagnostic report for bug reports.",
   "HEROMANCER.Settings.Troubleshooter.Menu.Label": "Open Troubleshooter",
